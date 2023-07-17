@@ -1,0 +1,48 @@
+schemaVersion: 2.2.0
+metadata:
+  name: nodejs-react-app
+attributes:
+  controller.devfile.io/devworkspace-config:
+    name: devworkspace-config
+  controller.devfile.io/scc: container-build
+  controller.devfile.io/storage-type: per-workspace
+projects:
+  - name: nodejs-react-app
+    git:
+      checkoutFrom:
+          remote: origin
+      remotes:
+          origin: https://github.com/bbalakriz/nodejs-react-app
+components:
+  - attributes:
+      controller.devfile.io/merge-contribution: true
+    container:
+      endpoints:
+        - exposure: public
+          name: app-url
+          protocol: https
+          targetPort: 8080
+      env:
+        - name: OPENVSX_REGISTRY_URL
+          value: https://open-vsx.org
+      image: quay.io/devfile/universal-developer-image:ubi8-latest
+      memoryLimit: 1G
+      sourceMapping: /projects
+    name: tools
+commands:
+  - exec:
+      commandLine: npm install
+      component: tools
+      group:
+        kind: build
+      label: Install all required dependencies
+      workingDir: ${PROJECT_SOURCE}
+    id: install-dependencies
+  - exec:
+      commandLine: npm start
+      component: tools
+      group:
+        kind: run
+      label: Start the local server
+      workingDir: ${PROJECT_SOURCE}
+    id: start-application
